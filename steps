@@ -1,0 +1,18 @@
+sudo nano /etc/systemd/system/pihole-display.service
+
+[Unit]
+Description=Pi-hole Display
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/pihole-display.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl daemon-reload
+
+sudo systemctl enable pihole-display.service
+
+sudo systemctl start pihole-display.service
