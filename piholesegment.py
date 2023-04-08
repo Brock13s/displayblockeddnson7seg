@@ -3,9 +3,11 @@ from luma.led_matrix.device import max7219
 from luma.led_matrix.device import sevensegment
 from luma.core.legacy import show_message
 from luma.core.legacy.font import proportional, CP437_FONT
-import requests
+#import requests
 import threading
 import time
+import json
+import subprocess
 
 # Set up the MAX7219 display
 serial = spi(port=0, device=0, gpio=noop())
@@ -13,8 +15,8 @@ device = max7219(serial, cascaded=1)
 seg = sevensegment(device)
 
 # Set up the Pi-hole API endpoint and API key
-api_endpoint = 'http://192.168.68.66/admin/api.php'
-api_key = '##########'
+#api_endpoint = 'http://192.168.68.66/admin/api.php'
+#api_key = '9b1a8a928675741a3bc2a87a4ff5ed0b22f86d695851e77e7ff9da8a6a90eb80'
 
 # Keep track of the current blocked queries count
 current_count = 0
@@ -25,11 +27,13 @@ def update_display():
     while True:
         # Retrieve the blocked queries count from Pi-hole
         try:
-            params = {'auth': api_key, 'summary': 'summary'}
-            response = requests.get(api_endpoint, params=params)
-            overall_stats = response.json()
-            blocked_ads_str = overall_stats['ads_blocked_today']
-            blocked_count = int(blocked_ads_str.replace(',', ''))
+#            params = {'auth': api_key, 'summary': 'summary'}
+#            response = requests.get(api_endpoint, params=params)
+#            overall_stats = response.json()
+            output = subprocess.check_output(["pihole", "-c", "-j"]).decode()
+            overall_stats = json.loads(output)
+            blocked_count = overall_stats['ads_blocked_today']
+#            blocked_count = int(blocked_ads_str.replace(',', ''))
         except:
             # If there is an error retrieving the count, print an error message and skip this update
             print("Error retrieving blocked queries count")
